@@ -8,8 +8,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait              # ✅ NEW
-from selenium.webdriver.support import expected_conditions as EC     # ✅ NEW
+from selenium.webdriver.support.ui import WebDriverWait              
+from selenium.webdriver.support import expected_conditions as EC     
 
 options = Options()
 options.add_argument('--headless') 
@@ -35,26 +35,23 @@ try:
     driver.find_element(By.ID, "login-submit").click()
     time.sleep(3)
 
-    # Navigate to Feeds page
+    # Feeds
     driver.get(PORTAL_FEEDS)
 
-    # ✅ Wait until table rows are loaded (instead of fixed sleep)
+ 
     try:
         WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "table.dataTable tbody tr"))
         )
     except Exception:
-        print("❌ Could not find the table rows within 20 seconds")
+        print(" Could not find the table rows within 20 seconds")
         raise
 
-    # ✅ Grab the table element after it's loaded
     table = driver.find_element(By.CSS_SELECTOR, "table.dataTable")
 
-    # ✅ Fixed typo: "thread th" → "thead th"
     headers = [th.text.strip() for th in table.find_elements(By.CSS_SELECTOR, "thead th")]
     print("Extracted headers:", headers)
 
-    # ✅ Make header match case-insensitive
     code_idx = next((i for i, h in enumerate(headers) if "code" in h.lower()), -1)
     desc_idx = next((i for i, h in enumerate(headers) if "description" in h.lower()), -1)
     active_idx = next((i for i, h in enumerate(headers) if "active" in h.lower()), -1)
@@ -65,7 +62,7 @@ try:
     rows_data = []
     rows = table.find_elements(By.CSS_SELECTOR, "tbody tr")
 
-    for tr in rows:
+    for idx,tr in enumerate(rows, start=1):
         tds = tr.find_elements(By.TAG_NAME, "td")
         if len(tds) < max(code_idx, desc_idx, active_idx) + 1:
             continue
@@ -78,7 +75,7 @@ try:
         is_active = ('✓' in active_text or "fa-check" in active_cell.get_attribute("innerHTML"))
 
         if code or desc:
-            rows_data.append({"Code": code, "Description": desc, "Active": is_active})  # ✅ Fixed typo 'Ative' → 'Active'
+            rows_data.append({"S.No": idx,"Code": code, "Description": desc, "Active": is_active})  # ✅ Fixed typo 'Ative' → 'Active'
 
     print(f"Extracted {len(rows_data)} rows")
 
@@ -87,7 +84,7 @@ try:
     print("Sheet updated!", res.text)
 
 except Exception as e:
-    print("❌ Could not complete the scraping task")
+    print("Could not complete the scraping task")
     print("Current page URL:", driver.current_url)
     print("Page HTML snapshot:")
     print(driver.page_source[:1500])  # Print first 1500 characters of HTML
