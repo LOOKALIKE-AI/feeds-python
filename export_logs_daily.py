@@ -3,38 +3,32 @@ import os, re, time, json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import Final, Tuple, List
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from env_utils import load_env, require_env, get_bool
+load_env(".env")
 
-# ---------- env helpers ----------
-def require_env(name: str) -> str:
-    v = os.getenv(name)
-    if v is None or not str(v).strip():
-        raise EnvironmentError(f"Missing required environment variable: {name}")
-    return str(v)
-
+# --- env (typed) ---
 PORTAL_LOGIN: Final[str] = require_env("PORTAL_LOGIN_URL")
 PORTAL_USER:  Final[str] = require_env("PORTAL_USER")
 PORTAL_PASS:  Final[str] = require_env("PORTAL_PASS")
-LOGS_URL:     Final[str] = require_env("PORTAL_LOGS_URL")  # e.g. https://.../elfinder/?log
-WEBAPP:       Final[str] = require_env("WEBAPP_URL")
-PREVIEW_ONLY = str(os.getenv("PREVIEW_ONLY", "")).lower() in ("1","true","yes","y")
+LOGS_URL:     Final[str] = require_env("PORTAL_LOGS_URL")
+WEBAPP:       Final[str] = os.getenv("WEBAPP_URL", "")  # required only when not previewing
+PREVIEW_ONLY: Final[bool] = get_bool("PREVIEW_ONLY", False)
+
+# --- date selection ---
 tz = ZoneInfo("Europe/Rome")
 now_local = datetime.now(tz)
 target_date = (now_local - timedelta(days=1)).date()
-# robust + type-safe
-# SAFE override from env (never None)
 logs_date_env = os.getenv("LOGS_DATE", "").strip()
 if logs_date_env:
-    target_date = datetime.strptime(logs_date_env, "%Y-%m-%d").date()
-
-# 🔧 define this so filters like name.startswith(date_prefix) work
-date_prefix: str = target_date.strftime("%Y-%m-%d")
-
+    try:
+        target_date = datetime.strptime(logs_date_env, "%Y-%m-%d").date()
+    except ValueError as e:
+        raise ValueError(f"LOGS_DATE must be YYYY-MM-DD, got '{logs_date_env}': {e}")
 
 def get_driver():
     opts = Options()
@@ -94,7 +88,12 @@ def parse_file(text: str) -> Tuple[int,int,int,dict]:
 
 # ---------- main ----------
 def main():
-    print(f"[logs] Target date: {target_date} (prefix: {date_prefix})  PREVIEW_ONLY={PREVIEW_ONLY}")
+    if not PREVIEW_ONLY and not WEBAPP:
+        raise EnvironmentError("WEBAPP_URL is required when PREVIEW_ONLY is false.")
+
+    prefix = target_date.strftime("%Y-%m-%d")
+    print(f"[logs] Target date: {target_date}  PREVIEW_ONLY={PREVIEW_ONLY}")
+
     driver = get_driver()
     try:
         # login
@@ -105,7 +104,7 @@ def main():
         driver.find_element(By.ID, "login-submit").click()
         WebDriverWait(driver, 20).until(EC.url_contains("gestionale"))
 
-        # open elFinder
+        # open logs (elFinder)
         driver.get(LOGS_URL)
         WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".elfinder-toolbar, .elfinder-cwd")))
         time.sleep(1.0)
@@ -198,6 +197,9 @@ def main():
     finally:
         driver.quit()
 
+if __name__ == "__main__":
+    main()
+    
 def post_to_sheet(payload: dict):
     import requests
     r = requests.post(WEBAPP, json={"logDaily": payload}, timeout=60)
