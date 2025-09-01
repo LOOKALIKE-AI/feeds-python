@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from typing import Final, Tuple, List
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -35,6 +36,7 @@ def get_driver():
     opts.add_argument("--headless=new")
     opts.add_argument("--no-sandbox")
     opts.add_argument("--disable-dev-shm-usage")
+    opts.add_argument("--window-size=1400,900")
     return webdriver.Chrome(options=opts)
 
 # ---------- parsing ----------
@@ -106,8 +108,7 @@ def main():
 
         # open logs (elFinder)
         driver.get(LOGS_URL)
-        WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".elfinder-toolbar, .elfinder-cwd")))
-        time.sleep(1.0)
+        goto_logs_page(driver, LOGS_URL, timeout=60)
 
         # connector + list files
         files = driver.execute_async_script("""
@@ -203,6 +204,53 @@ def main():
         driver.quit()
 
 
+def goto_logs_page(driver, logs_url: str, timeout: int = 60):
+    # Try direct URL first
+    driver.get(logs_url)
+    WebDriverWait(driver, timeout).until(
+        lambda d: d.execute_script("return document.readyState") == "complete"
+    )
+
+    # If elFinder already present, we’re done
+    if _find_elfinder_in_current_context(driver):
+        wait_for_elfinder(driver, timeout=timeout)
+        return
+
+    # If we’re on the dashboard (or still no elFinder), click through the menu.
+    on_dashboard = ("Dashboard" in (driver.title or "")) or ("/gestionale/" in (driver.current_url or ""))
+    if on_dashboard or not _find_elfinder_in_current_context(driver):
+        # 1) Expand the hamburger so #navbarSupportedContent gets .show
+        try:
+            toggler = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.navbar-toggler"))
+            )
+            driver.execute_script("arguments[0].click();", toggler)
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "#navbarSupportedContent.show"))
+            )
+        except Exception:
+            # If it's already expanded (desktop width), ignore.
+            pass
+
+        # 2) Open Reports dropdown
+        reports_btn = WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "li.menu_item_41 > a.nav-link.dropdown-toggle")  # "Reports"
+            )
+        )
+        driver.execute_script("arguments[0].click();", reports_btn)
+
+        # 3) Click "Log Files"
+        logs_link = WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, "li.menu_item_41 .dropdown-menu a[href*='elfinder/?log']")
+            )
+        )
+        driver.execute_script("arguments[0].click();", logs_link)
+
+    # 4) Now wait until elFinder is actually ready (handles iframe too)
+    wait_for_elfinder(driver, timeout=timeout)
+
     
 def post_to_sheet(payload: dict):
     import requests
@@ -238,5 +286,81 @@ def write_summary(totals: dict, per_file: List[dict]):
             else:
                 f.write("_No files found_\n")
             f.write(f"\n**TOTALS:** {totals['aggiornare']} / {totals['modificati']} / {totals['cancellati']}\n")
+def dump_dom(driver):
+    try:
+        with open("elfinder_debug.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        driver.save_screenshot("elfinder_debug.png")
+        print("[debug] Wrote elfinder_debug.html and elfinder_debug.png")
+    except Exception as e:
+        print("[debug] Failed to write debug artifacts:", e)
+    print("[debug] URL:", driver.current_url)
+    try:
+        print("[debug] Title:", driver.title)
+    except Exception:
+        pass
+
+def _find_elfinder_in_current_context(driver) -> bool:
+    # Check for the container
+    has_container = bool(driver.find_elements(By.CSS_SELECTOR, "div.elfinder, #elfinder"))
+    if not has_container:
+        return False
+    # Check for the JS instance
+    return bool(driver.execute_script("""
+        var $ = window.$ || window.jQuery;
+        if (!$) return false;
+        var el = $('.elfinder'); if (!el.length) el = $('#elfinder');
+        if (!el.length) return false;
+        try {
+          var inst = el.elfinder('instance');
+          return !!(inst && inst.cwd());
+        } catch (e) { return false; }
+    """))
+
+def _switch_into_elfinder_iframe(driver) -> bool:
+    # Look for an iframe that contains elFinder and switch into it
+    iframes = driver.find_elements(By.TAG_NAME, "iframe")
+    for i, frame in enumerate(iframes):
+        try:
+            driver.switch_to.frame(frame)
+            if _find_elfinder_in_current_context(driver):
+                print(f"[logs] Switched into iframe #{i} for elFinder.")
+                return True
+            # Not here; pop back out and try next
+            driver.switch_to.default_content()
+        except Exception:
+            driver.switch_to.default_content()
+    return False
+
+def wait_for_elfinder(driver, timeout=45):
+    # Wait for HTML to be ready
+    WebDriverWait(driver, timeout).until(
+        lambda d: d.execute_script("return document.readyState") == "complete"
+    )
+
+    # If redirected to login, bail early with a clear message
+    if ("login" in driver.current_url.lower()) or driver.find_elements(By.NAME, "data[username]"):
+        dump_dom(driver)
+        raise RuntimeError("Redirected to login while opening logs page. Session not kept or credentials/URL issue.")
+
+    # Try to find elFinder in the main document
+    if _find_elfinder_in_current_context(driver):
+        return
+
+    # If not found, try iframes
+    if _switch_into_elfinder_iframe(driver):
+        return
+
+    # Poll a bit (some installs initialize slowly)
+    end = time.time() + timeout
+    while time.time() < end:
+        if _find_elfinder_in_current_context(driver):
+            return
+        if _switch_into_elfinder_iframe(driver):
+            return
+        time.sleep(0.5)
+
+    dump_dom(driver)
+    raise TimeoutException("elFinder not detected (no container/instance). See debug artifacts for details.")
 if __name__ == "__main__":
     main()

@@ -1,0 +1,484 @@
+<html lang="it"><head>
+         <!--- ICONE  -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://ws.lookalike.shop/gestionale/img/favicon/apple-touch-icon.png?v=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://ws.lookalike.shop/gestionale/img/favicon/favicon-32x32.png?v=1">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://ws.lookalike.shop/gestionale/img/favicon/favicon-16x16.png?v=1">
+    <link rel="manifest" href="https://ws.lookalike.shop/gestionale/img/favicon/site.webmanifest?v=1">
+    <link rel="mask-icon" href="https://ws.lookalike.shop/gestionale/img/favicon/safari-pinned-tab.svg?v=1" color="#5bbad5">
+    <link rel="shortcut icon" href="https://ws.lookalike.shop/gestionale/img/favicon/favicon.ico?v=1">
+    <meta name="apple-mobile-web-app-title" content="Lookalike">
+    <meta name="application-name" content="Lookalike">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-config" content="https://ws.lookalike.shop/gestionale/img/favicon/browserconfig.xml?v=1">
+    <meta name="theme-color" content="#ffffff">
+    <!--- fine ICONE  -->        <meta name="robots" content="noindex, nofollow">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=no">
+        <title>Dashboard | Lookalike</title>
+        
+        <!-- CSS -->
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://ws.lookalike.shop/gestionale/css/font-awesome.min.css">
+        <!-- Bootstrap core CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Bootstrap extra button style -->
+        <link href="https://ws.lookalike.shop/gestionale/css/button.css" rel="stylesheet">
+        <!-- DataTables CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <link href="https://ws.lookalike.shop/gestionale/css/buttons.bootstrap4.min.css" rel="stylesheet">
+        <!-- jQuery UI CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/jquery-ui.min.css" rel="stylesheet">
+        <!-- Select2 CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/select2.min.css" rel="stylesheet">
+        <!-- Flatpickr CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/flatpickr.min.css" rel="stylesheet">
+        <!-- Croppie CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/croppie.css" rel="stylesheet">
+        <!-- Toastr CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/toastr.min.css" rel="stylesheet">
+        <!-- Lobilist CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/b4web_lobilist.css" rel="stylesheet">
+        <!-- FullCalendar CSS -->
+        <link href="https://ws.lookalike.shop/gestionale/css/fullcalendar.min.css" rel="stylesheet">
+        <link media="print" href="https://ws.lookalike.shop/gestionale/css/fullcalendar.print.css" rel="stylesheet">
+        <link href="https://ws.lookalike.shop/gestionale/css/scheduler.min.css" rel="stylesheet">
+		<!--Banner CSS-->
+		<link href="https://ws.lookalike.shop/gestionale/css/banner.css?t=" rel="stylesheet">
+        <!-- Bootstrap Colorpicker -->
+        <link href="https://ws.lookalike.shop/gestionale/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+        <!-- Fontawesome Iconpicker -->
+        <link href="https://ws.lookalike.shop/gestionale/css/fontawesome-iconpicker.min.css" rel="stylesheet">
+        <link href="https://ws.lookalike.shop/gestionale/b4web_modules/HandsonPlus/HandsonStyle.css?t=1637331343" rel="stylesheet"><link href="https://ws.lookalike.shop/gestionale/b4web_modules/HandsonPlus/handsontable.full.min.css?t=1637331343" rel="stylesheet"><link href="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus/Tableplus.css?t=1698050705" rel="stylesheet"><link href="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus/fixedHeader.dataTables.min.css?t=1637331343" rel="stylesheet"><link href="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus_dettaglio_attivita/Tableplus_dettaglio_attivita.css?t=1637331343" rel="stylesheet"><link href="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus_dettaglio_fatture/Tableplus_dettaglio_fatture.css?t=1637331343" rel="stylesheet"><link href="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus_documenti/Tableplus_documenti.css?t=1674138086" rel="stylesheet">        <link href="https://ws.lookalike.shop/gestionale/css/style.css?t=1637331343" rel="stylesheet">
+        
+        <!-- JS -->
+        <!-- Jquery -->
+        <script src="https://ws.lookalike.shop/gestionale/js/jquery-3.2.1.min.js"></script>
+        <!-- Bootstrap core JavaScript -->
+        <script src="https://ws.lookalike.shop/gestionale/js/popper.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/bootstrap.min.js"></script>
+
+         <!-- AGGIUNTO DA ME -->
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+
+        
+        <!-- DataTables -->
+        <script src="https://ws.lookalike.shop/gestionale/js/jquery.dataTables.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/date-eu.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/date-euro.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/dataTables.buttons.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/jszip.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/pdfmake.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/vfs_fonts.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/buttons.html5.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/buttons.bootstrap4.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/buttons.print.min.js"></script>
+        <!-- jQuery UI -->
+        <script src="https://ws.lookalike.shop/gestionale/js/jquery-ui.min.js"></script>
+        <!-- Bootbox -->
+         <script src="https://ws.lookalike.shop/gestionale/js/bootbox.min.js"></script>
+        <!-- Select2 -->
+        <script src="https://ws.lookalike.shop/gestionale/js/select2.full.min.js"></script>
+        <!-- Flatpickr -->
+        <script src="https://ws.lookalike.shop/gestionale/js/flatpickr.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/flatpickr_IT.js"></script>
+        <script>flatpickr.localize(flatpickr.l10ns.it);</script>
+        <!-- Croppie -->
+        <script src="https://ws.lookalike.shop/gestionale/js/croppie.min.js"></script>
+        <!-- Toastr -->
+        <script src="https://ws.lookalike.shop/gestionale/js/toastr.min.js"></script>
+        <!-- Lobilist -->
+        <script src="https://ws.lookalike.shop/gestionale/js/b4web_lobilist.js"></script>
+        <!-- TinyMCE -->
+        <script src="https://ws.lookalike.shop/gestionale/js/tinymce.min.js"></script>
+        <!-- FullCalendar -->
+        <script src="https://ws.lookalike.shop/gestionale/js/moment-with-locales.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/fullcalendar.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/fullcalendar-locale-all.min.js"></script>
+        <script src="https://ws.lookalike.shop/gestionale/js/scheduler.min.js"></script>
+        <!-- Shortcut tasti-->
+        <script src="https://ws.lookalike.shop/gestionale/js/shortcut.js"></script>
+		<!-- Md5 -->
+        <script src="https://ws.lookalike.shop/gestionale/js/md5.min.js"></script>
+        <!-- Bootstrap Colorpicker -->
+        <script src="https://ws.lookalike.shop/gestionale/js/bootstrap-colorpicker.min.js"></script>
+        <!-- Fontawesome Iconpicker -->
+        <script src="https://ws.lookalike.shop/gestionale/js/fontawesome-iconpicker.min.js"></script>
+        <!-- Autonumeric 4.1.0 -->
+        <script src="https://ws.lookalike.shop/gestionale/js/autonumeric_4.1.0.js"></script>
+        
+        <script src="https://ws.lookalike.shop/gestionale/b4web_modules/HandsonPlus/handsonfunctions.js?v=1637331343"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/HandsonPlus/handsontable.full.min.js?v=1637331343"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus/Tableplus.js?v=1724682487"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus/dataTables.fixedHeader.min.js?v=1637331343"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus/it.js?v=1637331343"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus_dettaglio_attivita/Tableplus_dettaglio_attivita.js?v=1637331343"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus_dettaglio_attivita/b4Feste.json?v=1637331343"></script><script src="https://ws.lookalike.shop/gestionale/b4web_modules/Tableplus_documenti/Tableplus_documenti.js?v=1637331343"></script>        <script src="https://ws.lookalike.shop/gestionale/js/function.js?t=1637331343"></script>
+
+    </head>
+    <body id="body_">
+        <script>
+            console.log("%c Attenzione! ", "color: #f00; text-shadow:0px 0px 1px #000; font-size:40px; font-family:cambria; font-weight:bold;");
+            console.log("%c Questa funzione del browser è pensata per gli sviluppatori. Se ti è stato detto di copiare qualcosa qui, in realtà si tratta di una truffa che fornirà a queste persone l'accesso al tuo account.\n ", "color: #888; font-size:20px; font-family:tahoma");
+        </script>
+    <script>var sitename="https://ws.lookalike.shop/gestionale"</script>
+    <!--Main Navigation-->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top indigo">
+            <a class="navbar-brand" href="https://ws.lookalike.shop/gestionale" style="padding:0;"><img class="img-fluid" style="max-height: 42px;" src="https://ws.lookalike.shop/gestionale/img/logo.png?v=1"></a>
+            <li class="nav-item d-lg-none" id="mobileGlobalSearchIcon">
+                <a class="nav-link" onclick="showGlobalSearch()" data-toggle="tooltip" data-placement="bottom" title="" style="cursor:pointer;" data-original-title="Ricerca attività cliente"><i class="fa fa-search" aria-hidden="true"></i></a>
+            </li>
+            <button class="custom-toggler navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active menu_item_0 hovered">
+                        <a class="nav-link" href="index.php"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <span class="sr-only">(current)</span></a>
+                    </li>
+                    
+                    <li class="nav-item dropdown menu_item_44 "><a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-mobile" aria-hidden="true"></i> App</a> <div class="dropdown-menu" aria-labelledby="navbarDropdown"><a class="dropdown-item menu_item_47" href="gestione_homepage.php"><i class="fa fa-home" aria-hidden="true"></i>
+ Homepage</a><a class="dropdown-item menu_item_29" href="gestione_banner.php"><i class="fa fa-picture-o" aria-hidden="true"></i>
+ Banners (Old)</a><a class="dropdown-item menu_item_36" href="gestione_custom_messages.php"><i class="fa fa-flag-o" aria-hidden="true"></i> Custom messages</a><a class="dropdown-item menu_item_43" href="rowConfig.php"><i class="fa fa-cogs" aria-hidden="true"></i> Marketplace Configurator</a><a class="dropdown-item menu_item_30" href="invio_notifiche.php"><i class="fa fa-paper-plane-o" aria-hidden="true"></i> Notifications</a><a class="dropdown-item menu_item_38" href="gestione_utenti_app.php?type=registered"><i class="fa fa-user" aria-hidden="true"></i>
+
+ Registered Users</a><a class="dropdown-item menu_item_39" href="gestione_utenti_app.php?type=unregistered"><i class="fa fa-user-o" aria-hidden="true"></i>
+
+ Unregistered Users</a></div></li>                                        <li class="nav-item  menu_item_17 ">
+                                            <a class="nav-link" href="gestione_feeds.php"><i class="fa fa-tasks" aria-hidden="true"></i>
+ Feeds</a>
+                                        </li>
+                                    <li class="nav-item dropdown menu_item_32 "><a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-tags" aria-hidden="true"></i>
+
+ Tags</a> <div class="dropdown-menu" aria-labelledby="navbarDropdown"><a class="dropdown-item menu_item_33" href="gestione_tags.php"><i class="fa fa-tags" aria-hidden="true"></i> Gestione Tags</a><a class="dropdown-item menu_item_31" href="test_tags.php?feed=1"><i class="fa fa-tags" aria-hidden="true"></i> Test Tags</a></div></li>                                        <li class="nav-item  menu_item_18 ">
+                                            <a class="nav-link" href="gestione_products.php"><i class="fa fa-cart-arrow-down" aria-hidden="true"></i> Products</a>
+                                        </li>
+                                    <li class="nav-item dropdown menu_item_24 "><a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-archive" aria-hidden="true"></i>
+ Categories</a> <div class="dropdown-menu" aria-labelledby="navbarDropdown"><a class="dropdown-item menu_item_19" href="gestione_categories.php"><i class="fa fa-archive" aria-hidden="true"></i>
+ Categories</a><a class="dropdown-item menu_item_21" href="gestione_category_matches.php"><i class="fa fa-clipboard" aria-hidden="true"></i>
+ Matches</a><a class="dropdown-item menu_item_34" href="gestione_category_missing.php"><i class="fa fa-question" aria-hidden="true"></i> Missing</a></div></li><li class="nav-item dropdown menu_item_23 "><a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-paint-brush" aria-hidden="true"></i>
+ Colors</a> <div class="dropdown-menu" aria-labelledby="navbarDropdown"><a class="dropdown-item menu_item_20" href="gestione_colors.php"><i class="fa fa-paint-brush" aria-hidden="true"></i>
+ Colors</a><a class="dropdown-item menu_item_22" href="gestione_color_matches.php"><i class="fa fa-clipboard" aria-hidden="true"></i>
+ Matches</a><a class="dropdown-item menu_item_35" href="gestione_color_missing.php"><i class="fa fa-question" aria-hidden="true"></i> Missing</a></div></li><li class="nav-item dropdown menu_item_26 "><a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-list-alt" aria-hidden="true"></i>
+
+ Stocks</a> <div class="dropdown-menu" aria-labelledby="navbarDropdown"><a class="dropdown-item menu_item_27" href="gestione_stocks.php"><i class="fa fa-list-alt" aria-hidden="true"></i>
+
+ Stocks</a><a class="dropdown-item menu_item_28" href="gestione_stocks_matches.php"><i class="fa fa-clipboard" aria-hidden="true"></i>
+ Matches</a></div></li>                                        <li class="nav-item  menu_item_40 ">
+                                            <a class="nav-link" href="gestione_brands_ko.php"><i class="fa fa-exclamation" aria-hidden="true"></i> Brands KO</a>
+                                        </li>
+                                                                            <li class="nav-item  menu_item_25 ">
+                                            <a class="nav-link" href="searches.php"><i class="fa fa-search" aria-hidden="true"></i> Searches</a>
+                                        </li>
+                                    <li class="nav-item dropdown menu_item_41 "><a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-pie-chart" aria-hidden="true"></i> Reports</a> <div class="dropdown-menu" aria-labelledby="navbarDropdown"><a class="dropdown-item menu_item_42" href="products_in_error.php"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+ Products in error</a><a class="dropdown-item menu_item_45" href="feeds_reports.php"><i class="fa fa-tasks" aria-hidden="true"></i> Feeds reports</a><a class="dropdown-item menu_item_46" href="elfinder/?log"><i class="fa fa-file-text-o" aria-hidden="true"></i> Log Files</a></div></li>                </ul>
+                <ul class="navbar-nav ml-auto nav-flex-icons menu_right">
+                    <li class="nav-item menu_item_choose_agenzia">
+                        <div style="max-width:225px;">
+                                                    </div>
+                    </li> 
+                    <li class="nav-item avatar dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-5" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="https://ws.lookalike.shop/gestionale/img/profile-placeholder.png" class="img-fluid rounded-circle z-depth-0 smallProfileImage">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink-5">
+                            <a class="dropdown-item" href="profilo.php"><i class="fa fa-user" aria-hidden="true"></i> Profilo</a>
+                            <a class="dropdown-item" style="cursor:pointer;" onclick="clearCache()" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Cliccare e ricaricare la pagina se si vedono dati non aggiornati"><i class="fa fa-eraser" aria-hidden="true"></i> Pulisci cache</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="index.php?logout=true"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100" rel="stylesheet">
+
+<div class="gloabl-search-container">
+    <div class="gloabl-search-container-inner">
+
+        <div class="search">
+            <select style="width:100%; vertical-align :middle;" id="globalSearchInput" class="form-control select2-hidden-accessible" placeholder="Cerca cliente..." multiple="" tabindex="-1" aria-hidden="true"></select><span class="select2 select2-container select2-container--default" dir="ltr" style="width: 100%;"><span class="selection"><span class="select2-selection select2-selection--multiple globalsearch-containerCssClass" role="combobox" aria-haspopup="true" aria-expanded="false" tabindex="-1"><ul class="select2-selection__rendered"><li class="select2-search select2-search--inline"><input class="select2-search__field" type="search" tabindex="0" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" placeholder="" style="width: 0.75em;"></li></ul></span></span><span class="dropdown-wrapper" aria-hidden="true"></span></span>
+        </div>
+
+        <div class="clearfix"></div>
+        <div class="gloabl-search-label">Cerca</div>
+        <h3 onclick="hideGlobalSearch()" class="gloabl-search-close-button"></h3>
+
+    </div>
+</div>
+
+<div onclick="hideGlobalSearch()" class="gloabl-search-overlay"></div>
+
+<style>
+    #mobileGlobalSearchIcon{list-style: none;position: absolute;top: 9px;right: 85px;font-size: 25px;line-height: 0px;width: 56px;height: 40px;text-align: center;border-radius: 2px;background-color: #868e96;border: 1px solid #868e96;border-color: rgba(255, 255, 255, 0.1)!important;}
+    .gloabl-search-label{top: -85px;left: -13px;font-size: 65px;line-height: 65px;position: absolute;color:white;font-family: 'Raleway', sans-serif;}
+    .gloabl-search-overlay {position: fixed;width: 100%;height: 100%;display: none;top: 0;left: 0;z-index: 2000;background: rgba(0,0,0,0.8);-webkit-transition: all 0.3s;-moz-transition: all 0.3s;transition: all 0.3s;}
+    .gloabl-search-container {width: 80%;left: 10%;top: 30%;position: fixed;z-index: 2001;display: none;}
+    .gloabl-search-container-inner {transition: all 0.3s;}
+    .globalsearch-dropdownCssClass {z-index:2001;border:0px;}
+    .gloabl-search-container-inner .select2-container--default .select2-selection--multiple {border-radius:0px;border:0px;}
+    .gloabl-search-container-inner .search .select2-container {font-size: 25px;padding: 15px 10px;width: 100%;background: #fff;vertical-align: middle;border: 0;color: #3A3A3A;}
+    .gloabl-search-close-button {background: url(https://ws.lookalike.shop/gestionale/img/close_button.png) top center;background-size: 100% auto;width: 50px;height: 50px;padding: 0px;margin: 0px;top: -80px;right: -13px;font-size: 40px;line-height: 40px;position: absolute;cursor:pointer;filter: invert(1);}
+    .gloabl-search-close-button:hover {background: url(https://ws.lookalike.shop/gestionale/img/close_button.png) bottom center;background-size: 100% auto;filter: invert(0);}
+    .globalsearch-dropdownCssClass .select2-results__option {padding: 20px 6px;}
+    .gloabl-search-container-inner .select2-container--default .select2-selection--multiple{border:0px!important;}
+</style>
+<script>
+    $(document).ready(function(){
+        $('#globalSearchInput').select2({
+            ajax: {
+                url: sitename+'/system/ajax.php?action=globalsearch',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                        return {
+                        results: data.results
+                        };
+                },
+                cache: true
+            },
+            minimumInputLength: 3,
+            multiple:true,
+            maximumSelectionSize: 1,
+            containerCssClass: "globalsearch-containerCssClass",
+            dropdownCssClass: "globalsearch-dropdownCssClass"
+        });
+        $('#globalSearchInput').on('select2:select', function (e) {
+            window.location.href = sitename+'/attivita.php?cliente='+$('#globalSearchInput').val()+'&associato='+$('#globalSearchInput').val();
+        });
+    });
+
+    function showGlobalSearch(){
+        $("#globalSearchInput").val("");
+        $(".gloabl-search-overlay").fadeIn();
+        $(".gloabl-search-container").fadeIn();
+        setTimeout(() => {
+            $("#globalSearchInput").focus();
+        }, 500);
+    }
+    function hideGlobalSearch(){
+        $(".gloabl-search-overlay").fadeOut();
+        $(".gloabl-search-container").fadeOut();
+    }
+</script>
+    <div class="modal fade modalInfo" id="modalInfoCliente" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Info cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times-circle-o" aria-hidden="true"></i> Chiudi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#modalInfoCliente').on('hidden.bs.modal', function (e) {
+            $("#modalInfoCliente .modal-body").html("");
+        })
+
+        function openInfoCliente(id){
+            var data={};
+            data["id"]=id;
+            $.ajax({
+                url: sitename+"/system/ajax.php?action=getInfoCliente",
+                cache: false,
+                method: "POST",
+                data: data,
+                success: function(results){
+                    $('#modalInfoCliente .modal-body').html(results);
+                    $('#modalInfoCliente .modal-body input,#modalInfoCliente .modal-body textarea,#modalInfoCliente .modal-body select').attr("disabled","disabled");
+                    $('#modalInfoCliente').modal("show");
+                    $('#modalInfoCliente .myselect2:not(.select_si_no)').select2();
+                }
+            });
+        }
+    </script>
+    <div class="container-fluid" style="min-height: calc(100% - 78px);margin-bottom:30px;">
+            <div class="row">
+                <main class="col pt-3">
+
+<div class="container" id="container-home-start">
+    <div class="row rowhome text-center">
+    
+                        <div class="homebox col-6 mycol" id="homebox_1">
+                            <a href="https://ws.lookalike.shop/gestionale/searches.php">
+                                <div>
+                                    <i class="fa fa-search" aria-hidden="true"></i><br>
+                                    Searches
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_2">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_feeds.php">
+                                <div>
+                                    <i class="fa fa-tasks" aria-hidden="true"></i>
+<br>
+                                    Feeds
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_3">
+                            <a href="https://ws.lookalike.shop/gestionale/feeds_reports.php">
+                                <div>
+                                    <i class="fa fa-tasks" aria-hidden="true"></i><br>
+                                    Feeds reports
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_4">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_utenti_app.php?type=registered">
+                                <div>
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+
+<br>
+                                    Registered Users
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_5">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_products.php">
+                                <div>
+                                    <i class="fa fa-cart-arrow-down" aria-hidden="true"></i><br>
+                                    Products
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_6">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_brands_ko.php">
+                                <div>
+                                    <i class="fa fa-exclamation" aria-hidden="true"></i><br>
+                                    Brands KO
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_7">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_category_missing.php">
+                                <div>
+                                    <i class="fa fa-question" aria-hidden="true"></i><br>
+                                    Missing
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_8">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_tags.php">
+                                <div>
+                                    <i class="fa fa-tags" aria-hidden="true"></i><br>
+                                    Gestione Tags
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_9">
+                            <a href="https://ws.lookalike.shop/gestionale/gestione_categories.php">
+                                <div>
+                                    <i class="fa fa-archive" aria-hidden="true"></i>
+<br>
+                                    Categories
+                                </div>
+                            </a>
+                        </div>
+                    
+                        <div class="homebox col-6 mycol" id="homebox_10">
+                            <a href="https://ws.lookalike.shop/gestionale/rowConfig.php">
+                                <div>
+                                    <i class="fa fa-cogs" aria-hidden="true"></i><br>
+                                    Marketplace Configurator
+                                </div>
+                            </a>
+                        </div>
+                        </div>
+</div>
+<style>
+
+#container-home-start {margin-top:8%;font-size: 20px;}
+#container-home-start .rowhome .homebox > a > div {padding: 45px 0;min-height: 218px;}
+#container-home-start .rowhome div a div i {font-size: 56px;margin-bottom: 10px;}
+.rowhome{margin: 10px auto;}
+.homebox a{color:white;text-decoration:none;margin: 5px 0px;}
+#container-home-start .rowhome #homebox_1 > a > div{background-color:#E53935;}
+#container-home-start .rowhome #homebox_2 > a > div{background-color:#9C27B0;}
+#container-home-start .rowhome #homebox_3 > a > div{background-color:#3F51B5;}
+#container-home-start .rowhome #homebox_4 > a > div{background-color:#00BCD4;}
+#container-home-start .rowhome #homebox_5 > a > div{background-color:#4CAF50;}
+#container-home-start .rowhome #homebox_6 > a > div{background-color:#CDDC39;}
+#container-home-start .rowhome #homebox_7 > a > div{background-color:#FFC107;}
+#container-home-start .rowhome #homebox_8 > a > div{background-color:#FF6D00;}
+#container-home-start .rowhome #homebox_9 > a > div{background-color:#795548;}
+#container-home-start .rowhome #homebox_10 > a > div{background-color:#607D8B;}
+.mycol{padding: 5px!important;}
+
+@media(min-width:768px){
+    .mycol{max-width:33.3%!important;}
+    #homebox_10 {display:none!important;}
+}
+
+@media (min-width: 1025px) {
+    .mycol{max-width:20%!important;} 
+    #homebox_10 {display:block!important;}
+}
+</style>
+
+
+    </main>
+        </div>
+    </div>
+    <!--Main layout-->
+        <!--Footer-->
+    <footer class="container-fluid">
+        <div class="row text-center">
+            <div class="col-6 col-md-4 col-xl-2">
+                Powered by:<br><a href="https://www.b4web.biz" target="_blank">B4web</a>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+            <button class="btn btn-dark btn-sm" onclick="alert('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/139.0.0.0 Safari/537.36')" title="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/139.0.0.0 Safari/537.36">User Agent:</button>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                Vostro IP:<br>79.60.231.67            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                Ora del server:<br><span id="dataOraServer">11:24:54</span>
+            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                Aggiornamento pagina:<br>19/01/2023 15:21:26            </div>
+            <div class="col-6 col-md-4 col-xl-2">
+                Tempo esecuzione pagina:<br>0.157 sec            </div>
+        </div>
+        <script>
+            var currentTime=1756718634;
+
+            setInterval(function(){
+                currentTime=currentTime+1;
+                var date = new Date(currentTime*1000);
+                var hours = date.getHours();
+                var minutes = "0" + date.getMinutes();
+                var seconds = "0" + date.getSeconds();
+
+                $("#dataOraServer").html(hours+":"+minutes.substr(-2)+":"+seconds.substr(-2));
+            },1000);
+
+            setTimeout("refreshHeaderTodo()",60000);
+
+            
+        </script>
+    </footer>
+    <!--Footer-->  
+        
+        <div id="modalImgLightbox" class="modal fade" tabindex="-1" role="dialog">            <div class="modal-dialog modal-lg">                <div class="modal-content"></div>            </div>        </div>                <div id="modalImgLightbox" class="modal fade" tabindex="-1" role="dialog">            <div class="modal-dialog modal-lg">                <div class="modal-content"></div>            </div>        </div>        </body></html>
