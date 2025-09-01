@@ -134,6 +134,8 @@ def main():
             raise RuntimeError(f"elFinder open failed: {files.get('error')}")
 
         all_files = files["files"]
+        sample_names = [f.get("name","") for f in all_files][:50]
+        print("[logs] sample names in folder (first 50):", sample_names)
         logs_today = [
             f for f in files["files"]
             if f.get("name", "").endswith(".log") and f["name"].startswith(prefix)
