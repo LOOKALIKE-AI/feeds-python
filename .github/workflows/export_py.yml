@@ -3,11 +3,13 @@ name: Daily Feed Export
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 8 * * *'  # Every day at 8 AM UTC
+    - cron: '0 8 * * *'  # runs daily; metrics script summarizes "yesterday" in Europe/Rome
 
 jobs:
   export:
     runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Rome   # helps with logs/timestamps
 
     steps:
       - name: Checkout repo
@@ -23,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run export script
+      - name: Run export script (Feeds)
         env:
           PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
           PORTAL_FEEDS_URL: ${{ secrets.PORTAL_FEEDS_URL }}
@@ -31,3 +33,12 @@ jobs:
           PORTAL_PASS: ${{ secrets.PORTAL_PASS }}
           WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
         run: python export_feeds.py
+
+      - name: Run daily logs metrics -> Google Sheet
+        env:
+          PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
+          PORTAL_USER: ${{ secrets.PORTAL_USER }}
+          PORTAL_PASS: ${{ secrets.PORTAL_PASS }}
+          PORTAL_LOGS_URL: ${{ secrets.PORTAL_LOGS_URL }}   # add this secret (the elFinder ?log URL)
+          WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
+        run: python export_logs_daily.py
