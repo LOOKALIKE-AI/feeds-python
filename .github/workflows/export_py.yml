@@ -14,8 +14,13 @@ on:
       partner_name:
         description: 'Active partner name (substring) to snapshot into LogsPartners (optional)'
         required: false
+      run_all_partners:
+        description: 'Also snapshot ALL active partners into LogsPartners'
+        type: boolean
+        required: false
+        default: false
   schedule:
-    - cron: '0 8 * * *'  # runs daily; metrics script summarizes "yesterday" in Europe/Rome
+    - cron: '0 8 * * *'
 
 jobs:
   export:
@@ -51,7 +56,7 @@ jobs:
           PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
           PORTAL_USER:      ${{ secrets.PORTAL_USER }}
           PORTAL_PASS:      ${{ secrets.PORTAL_PASS }}
-          PORTAL_FEEDS_URL: ${{ secrets.PORTAL_FEEDS_URL }}   # used by the logs script to reach the Log buttons
+          PORTAL_FEEDS_URL: ${{ secrets.PORTAL_FEEDS_URL }}
           WEBAPP_URL:       ${{ secrets.WEBAPP_URL }}
           LOGS_DATE:        ${{ github.event.inputs.logs_date }}
           PREVIEW_ONLY:     ${{ github.event.inputs.preview_only }}
@@ -68,3 +73,14 @@ jobs:
           TARGET_PARTNER:   ${{ github.event.inputs.partner_name }}
           PREVIEW_ONLY:     ${{ github.event.inputs.preview_only }}
         run: python check_one_log.py
+
+      - name: Run ALL active partners snapshot -> LogsPartners
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_all_partners == 'true' }}
+        env:
+          PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
+          PORTAL_FEEDS_URL: ${{ secrets.PORTAL_FEEDS_URL }}
+          PORTAL_USER:      ${{ secrets.PORTAL_USER }}
+          PORTAL_PASS:      ${{ secrets.PORTAL_PASS }}
+          WEBAPP_URL:       ${{ secrets.WEBAPP_URL }}
+          PREVIEW_ONLY:     ${{ github.event.inputs.preview_only }}
+        run: python export_partner_logs_all.py
