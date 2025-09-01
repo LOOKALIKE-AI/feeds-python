@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from env_utils import load_env, require_env, get_bool
+from urllib.parse import urlparse, urljoin
 load_env(".env")
 
 # --- env (typed) ---
@@ -203,53 +204,37 @@ def main():
     finally:
         driver.quit()
 
+def _origin(u: str) -> str:
+    p = urlparse(u)
+    return f"{p.scheme}://{p.netloc}"
 
 def goto_logs_page(driver, logs_url: str, timeout: int = 60):
-    # Try direct URL first
+    """Open elFinder logs page. Avoid relative hrefs that create /elfinder/elfinder/?log."""
+    # 1) Direct attempt (absolute URL from env)
     driver.get(logs_url)
-    WebDriverWait(driver, timeout).until(
-        lambda d: d.execute_script("return document.readyState") == "complete"
-    )
-
-    # If elFinder already present, we’re done
-    if _find_elfinder_in_current_context(driver):
-        wait_for_elfinder(driver, timeout=timeout)
+    try:
+        wait_for_elfinder(driver, timeout=timeout)  # your existing robust wait
         return
+    except Exception as e:
+        print("[logs] Direct open didn’t show elFinder yet:", repr(e))
 
-    # If we’re on the dashboard (or still no elFinder), click through the menu.
-    on_dashboard = ("Dashboard" in (driver.title or "")) or ("/gestionale/" in (driver.current_url or ""))
-    if on_dashboard or not _find_elfinder_in_current_context(driver):
-        # 1) Expand the hamburger so #navbarSupportedContent gets .show
-        try:
-            toggler = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "button.navbar-toggler"))
-            )
-            driver.execute_script("arguments[0].click();", toggler)
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "#navbarSupportedContent.show"))
-            )
-        except Exception:
-            # If it's already expanded (desktop width), ignore.
-            pass
-
-        # 2) Open Reports dropdown
-        reports_btn = WebDriverWait(driver, 15).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "li.menu_item_41 > a.nav-link.dropdown-toggle")  # "Reports"
-            )
+    # 2) Fallback: read the navbar link but force an ABSOLUTE href
+    try:
+        link = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "a.menu_item_46[href*='elfinder/?log']"))
         )
-        driver.execute_script("arguments[0].click();", reports_btn)
+        href = (link.get_attribute("href") or "").strip()
+    except Exception:
+        href = ""
 
-        # 3) Click "Log Files"
-        logs_link = WebDriverWait(driver, 15).until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, "li.menu_item_41 .dropdown-menu a[href*='elfinder/?log']")
-            )
-        )
-        driver.execute_script("arguments[0].click();", logs_link)
+    # If the href is missing or relative (e.g. 'elfinder/?log'), build a safe absolute URL
+    if not href or not href.startswith("http"):
+        # Always resolve to the canonical absolute path to prevent /elfinder/elfinder/?log
+        href = logs_url if logs_url.startswith("http") else urljoin(_origin(driver.current_url), "/gestionale/elfinder/?log")
 
-    # 4) Now wait until elFinder is actually ready (handles iframe too)
+    driver.get(href)
     wait_for_elfinder(driver, timeout=timeout)
+
 
     
 def post_to_sheet(payload: dict):
