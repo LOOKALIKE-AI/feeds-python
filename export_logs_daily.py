@@ -134,7 +134,10 @@ def main():
             raise RuntimeError(f"elFinder open failed: {files.get('error')}")
 
         all_files = files["files"]
-        logs_today = [f for f in all_files if f.get("name","").endswith(".log") and f["name"].startswith(date_prefix)]
+        logs_today = [
+            f for f in files["files"]
+            if f.get("name", "").endswith(".log") and f["name"].startswith(prefix)
+        ]
         names = [f["name"] for f in logs_today]
         print(f"[logs] Found {len(names)} log file(s) for {target_date}: {names}")
 
@@ -197,8 +200,7 @@ def main():
     finally:
         driver.quit()
 
-if __name__ == "__main__":
-    main()
+
     
 def post_to_sheet(payload: dict):
     import requests
@@ -234,3 +236,5 @@ def write_summary(totals: dict, per_file: List[dict]):
             else:
                 f.write("_No files found_\n")
             f.write(f"\n**TOTALS:** {totals['aggiornare']} / {totals['modificati']} / {totals['cancellati']}\n")
+if __name__ == "__main__":
+    main()
