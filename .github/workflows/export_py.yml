@@ -2,6 +2,15 @@ name: Daily Feed Export
 
 on:
   workflow_dispatch:
+    inputs:
+      logs_date:
+        description: 'YYYY-MM-DD to summarize (optional)'
+        required: false
+      preview_only:
+        description: 'Preview only (no sheet write)'
+        type: boolean
+        required: false
+        default: true
   schedule:
     - cron: '0 8 * * *'  # runs daily; metrics script summarizes "yesterday" in Europe/Rome
 
@@ -37,8 +46,10 @@ jobs:
       - name: Run daily logs metrics -> Google Sheet
         env:
           PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
-          PORTAL_USER: ${{ secrets.PORTAL_USER }}
-          PORTAL_PASS: ${{ secrets.PORTAL_PASS }}
-          PORTAL_LOGS_URL: ${{ secrets.PORTAL_LOGS_URL }}   # add this secret (the elFinder ?log URL)
-          WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
+          PORTAL_USER:      ${{ secrets.PORTAL_USER }}
+          PORTAL_PASS:      ${{ secrets.PORTAL_PASS }}
+          PORTAL_LOGS_URL:  ${{ secrets.PORTAL_LOGS_URL }}
+          WEBAPP_URL:       ${{ secrets.WEBAPP_URL }}
+          LOGS_DATE:        ${{ github.event.inputs.logs_date }}
+          PREVIEW_ONLY:     ${{ github.event.inputs.preview_only }}
         run: python export_logs_daily.py
