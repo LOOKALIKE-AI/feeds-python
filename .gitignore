@@ -1,1 +1,11 @@
-.env
+.env# Local only
+experiments/
+local/
+logs/
+.venv/
+__pycache__/
+*.log
+*.gz
+*.png
+*.html
+.DS_Store
