@@ -13,6 +13,9 @@ from urllib3.util.retry import Retry
 import requests  # pip install requests
 
 TZ = ZoneInfo("Europe/Rome")
+def is_valid_day(s: str | None) -> bool:
+    return bool(s and re.fullmatch(r"\d{4}-\d{2}-\d{2}", s) and "MM" not in s and "DD" not in s)
+
 def today_rome_str() -> str:
     return datetime.now(TZ).date().isoformat()
 
@@ -238,9 +241,13 @@ def fetch_logs_batch(day: str, filenames: list[str], batch_size: int = 20,
     return texts, missing
 
 def main():
-    # If LOGS_DATE is provided, summarize that day.
-    if DATE_FOR_FOLDER:
-        summarize_day_and_post(DATE_FOR_FOLDER)
+    # Prefer explicit LOGS_DATE if valid; else fallback
+    day_env = DATE_FOR_FOLDER if is_valid_day(DATE_FOR_FOLDER) else None
+    if day_env is None and DATE_FOR_FOLDER:
+        print(f"[summarize] Ignoring invalid LOGS_DATE='{DATE_FOR_FOLDER}' (expect YYYY-MM-DD)")
+
+    if day_env:
+        summarize_day_and_post(day_env)
         return
 
     # Otherwise: try today, else yesterday (Europe/Rome)

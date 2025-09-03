@@ -9,6 +9,7 @@ on:
       date:
         description: 'YYYY-MM-DD (used in daily mode; default: yesterday Europe/Rome)'
         required: false
+        default: ''
   schedule:
     # DST-safe: 06:00 Europe/Rome is 05:00 UTC in winter, 04:00 UTC in summer.
     - cron: '0 4 * * *'
@@ -58,14 +59,17 @@ jobs:
             dow=$(TZ=Europe/Rome date +%u) # 1=Mon
             if [ "$dow" = "1" ]; then mode="last7"; else mode="daily"; fi
           fi
-          if [ "$mode" = "daily" ]; then
-            if [ -n "${{ github.event.inputs.date }}" ]; then
-              day="${{ github.event.inputs.date }}"
+
+          # validate YYYY-MM-DD strictly
+          input_date="${{ github.event.inputs.date }}"
+          if [[ "$mode" = "daily" ]]; then
+            if [[ "$input_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              day="$input_date"
             else
               day=$(TZ=Europe/Rome date -d 'yesterday' +%F)
             fi
             echo "mode=daily" >> $GITHUB_OUTPUT
-            echo "day=$day" >> $GITHUB_OUTPUT
+            echo "day=$day"   >> $GITHUB_OUTPUT
             echo "Running DAILY for $day"
           else
             echo "mode=last7" >> $GITHUB_OUTPUT
