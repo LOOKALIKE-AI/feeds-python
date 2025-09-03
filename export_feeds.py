@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from env_utils import load_env, require_env
 
@@ -22,6 +24,20 @@ opts.add_argument("--headless=new")
 opts.add_argument("--no-sandbox")
 opts.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(options=opts)
+def make_session() -> requests.Session:
+    retry = Retry(
+        total=5,           # overall attempts (1 original + 4 retries)
+        connect=5,
+        read=5,
+        backoff_factor=1.5,                  # 0s, 1.5s, 3s, 4.5s, 6s …
+        status_forcelist=[500, 502, 503, 504],
+        allowed_methods={"GET", "POST"},     # include POST retries
+        raise_on_status=False,
+    )
+    s = requests.Session()
+    s.mount("https://", HTTPAdapter(max_retries=retry))
+    s.mount("http://",  HTTPAdapter(max_retries=retry))
+    return s
 
 try:
     # LOGIN
@@ -67,7 +83,9 @@ try:
     print(f"Extracted {len(rows_data)} rows")
 
     # Transfer to Google Sheets
-    res = requests.post(WEBAPP, json=rows_data, timeout=60)
+    session = make_session()
+    # (connect timeout, read timeout)
+    res = session.post(WEBAPP, json=rows_data, timeout=(15, 180))
     print("Sheet updated!", res.text)
 
 except Exception as e:

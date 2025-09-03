@@ -1,0 +1,76 @@
+name: "Logs: Fetch previous day"
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'YYYY-MM-DD to fetch (optional; defaults to yesterday in Europe/Rome)'
+        required: false
+  schedule:
+    # DST-safe: 05:00 Europe/Rome is 04:00 UTC in winter, 03:00 UTC in summer.
+    - cron: '0 3 * * *'
+    - cron: '0 4 * * *'
+
+concurrency:
+  group: logs-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Rome
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Chrome (for Selenium)
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Gate to 05:00 Europe/Rome on schedule
+        id: gate
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          hour=$(TZ=Europe/Rome date +%H)
+          if [ "$hour" = "05" ]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+            echo "Not 05:00 Europe/Rome (hour=$hour). Skipping."
+          fi
+
+      - name: Install dependencies
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compute target date (yesterday Europe/Rome or input)
+        id: when
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            day="${{ github.event.inputs.date }}"
+          else
+            day=$(TZ=Europe/Rome date -d 'yesterday' +%F)
+          fi
+          echo "day=$day"
+          echo "day=$day" >> $GITHUB_OUTPUT
+
+      - name: Fetch logs for target date
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
+        env:
+          PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
+          PORTAL_LOGS_URL:  ${{ secrets.PORTAL_LOGS_URL }}
+          PORTAL_USER:      ${{ secrets.PORTAL_USER }}
+          PORTAL_PASS:      ${{ secrets.PORTAL_PASS }}
+          WEBAPP_URL:       ${{ secrets.WEBAPP_URL }}
+          LOGS_DATE:        ${{ steps.when.outputs.day }}
+          SHOW_BROWSER:     'false'
+        run: python get_logs_day.py
