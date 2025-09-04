@@ -9,3 +9,4 @@ __pycache__/
 *.png
 *.html
 .DS_Store
+export_partner_logs_all.py
