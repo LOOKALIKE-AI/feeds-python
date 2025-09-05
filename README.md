@@ -10,26 +10,26 @@ Daily totals (whole day, not per partner) → old sheet via existing Apps Script
 
 Per-partner daily rows → new monthly Google Sheets:
 
-Logs-Sheets/
-  2025 logs/
-    2025-09 Partner Logs   (Spreadsheet)
-        2025-09-01  (sheet tab)
-            2025-09-02
+## Logs-Sheets/
+###   2025 logs/
+###     2025-09 Partner Logs   (Spreadsheet)
+###         2025-09-01  (sheet tab)
+###             2025-09-02
                 ...
 
-feeds-python/
-├─ export_feeds.py                    # Scrape Feeds table → post to sheet (Feeds + Active)
-├─ export_partner_logs_all.py         # (legacy) feeds/log links collector (Selenium)
-├─ collect_log_ids.py                 # Build FeedID → (Partner, Code, Active) map (Selenium)
-├─ get_logs_day.py                    # Upload all .log files for a day to Drive
-├─ summarize_log_counts.py            # Parse one day (global totals), post to old sheet
-├─ summarize_last_7_days.py           # Run summarize_log_counts.py over the last 7 days
-├─ summarize_log_counts_by_partner.py # Parse one day per-partner, write monthly sheet/tab
-├─ env_utils.py                       # Small env loader helpers
-├─ requirements.txt
-└─ .github/workflows/
-      ├─ logs_summarize.yml              # Daily totals @ ~06:00 Europe/Rome
-      └─ partner-logs-monthly.yml        # Collector + per-partner writer @ ~07:10 Europe/Rome
+## feeds-python/
+### ├─ `export_feeds.py`                    # Scrape Feeds table → post to sheet (Feeds + Active)
+### ├─ `export_partner_logs_all.py`         # (legacy) feeds/log links collector (Selenium)
+### ├─ `collect_log_ids.py`                 # Build FeedID → (Partner, Code, Active) map (Selenium)
+### ├─ `get_logs_day.py`                    # Upload all .log files for a day to Drive
+### ├─ `summarize_log_counts.py`            # Parse one day (global totals), post to old sheet
+### ├─ `summarize_last_7_days.py`           # Run summarize_log_counts.py over the last 7 days
+### ├─ `summarize_log_counts_by_partner.py` # Parse one day per-partner, write monthly sheet/tab
+### ├─ `env_utils.py`                       # Small env loader helpers
+### ├─ requirements.txt
+### └─ .github/workflows/
+###       ├─ `logs_summarize.yml`              # Daily totals @ ~06:00 Europe/Rome
+###       └─ `partner-logs-monthly.yml`        # Collector + per-partner writer @ ~07:10 Europe/Rome
 
 ## Environment & prerequisites
 
