@@ -1,6 +1,7 @@
 #Feeds & Logs Automation
 
 Automations to collect feed/log data from the gestionale portal, store raw logs in Google Drive, and write daily partner-level summaries into monthly Google Sheets. Built for macOS / Python + Selenium, with two Apps Scripts (old utility API + new monthly writer) and two GitHub Actions workflows.
+
 TL;DR
 
 Raw logs → Drive: LogsArchive/YYYY-MM-DD/*.log(.gz)
