@@ -13,9 +13,9 @@ Per-partner daily rows → new monthly Google Sheets:
 Logs-Sheets/
   2025 logs/
     2025-09 Partner Logs   (Spreadsheet)
-      2025-09-01  (sheet tab)
-      2025-09-02
-      ...
+        2025-09-01  (sheet tab)
+            2025-09-02
+                ...
 
 feeds-python/
 ├─ export_feeds.py                    # Scrape Feeds table → post to sheet (Feeds + Active)
@@ -28,8 +28,8 @@ feeds-python/
 ├─ env_utils.py                       # Small env loader helpers
 ├─ requirements.txt
 └─ .github/workflows/
-   ├─ logs_summarize.yml              # Daily totals @ ~06:00 Europe/Rome
-   └─ partner-logs-monthly.yml        # Collector + per-partner writer @ ~07:10 Europe/Rome
+      ├─ logs_summarize.yml              # Daily totals @ ~06:00 Europe/Rome
+      └─ partner-logs-monthly.yml        # Collector + per-partner writer @ ~07:10 Europe/Rome
 
 ## Environment & prerequisites
 
