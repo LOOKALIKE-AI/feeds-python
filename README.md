@@ -19,7 +19,6 @@ Per-partner daily rows → new monthly Google Sheets:
 
 ## feeds-python/
 ### ├─ `export_feeds.py`                    # Scrape Feeds table → post to sheet (Feeds + Active)
-### ├─ `export_partner_logs_all.py`         # (legacy) feeds/log links collector (Selenium)
 ### ├─ `collect_log_ids.py`                 # Build FeedID → (Partner, Code, Active) map (Selenium)
 ### ├─ `get_logs_day.py`                    # Upload all .log files for a day to Drive
 ### ├─ `summarize_log_counts.py`            # Parse one day (global totals), post to old sheet
