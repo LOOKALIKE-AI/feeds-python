@@ -63,20 +63,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Install Chrome for the Selenium-based collector
-      - name: Setup Chrome
-        if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
-        uses: browser-actions/setup-chrome@v1
-
       # Optional: set date from manual input so summarizer can use LOGS_DATE
       - name: Set date if provided (manual)
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.date != '' }}
         run: echo "LOGS_DATE=${{ github.event.inputs.date }}" >> $GITHUB_ENV
 
-      # 1) Refresh the FeedID → Partner map
-      - name: Collect LogIDs (Active partners)
-        if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
-        run: python collect_log_ids.py
         # If the portal is occasionally down, you can allow the run to continue:
         # continue-on-error: true
 
