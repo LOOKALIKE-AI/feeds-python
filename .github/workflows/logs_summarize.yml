@@ -4,10 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'daily | last7 (default: auto — Mon=last7, else=daily)'
+        description: 'last7 (optional; if set, runs last 7 days; otherwise runs daily)'
         required: false
+        default: ''
       date:
-        description: 'YYYY-MM-DD (used in daily mode; default: yesterday Europe/Rome)'
+        description: 'YYYY-MM-DD for daily mode (default: yesterday Europe/Rome)'
         required: false
         default: ''
   schedule:
@@ -32,6 +33,7 @@ jobs:
         with:
           python-version: '3.10'
 
+      # gate so scheduled triggers only execute at 06:00 Europe/Rome
       - name: Gate to 06:00 Europe/Rome on schedule
         id: gate
         if: ${{ github.event_name == 'schedule' }}
@@ -50,41 +52,37 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Decide mode (daily vs last7) and date
-        id: decide
+      # Decide what to run:
+      # - scheduled: always DAILY (yesterday, Europe/Rome)
+      # - manual: if mode == 'last7' then LAST7 else DAILY (date input or yesterday)
+      - name: Decide target day (daily mode only)
+        id: when
         if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
         run: |
-          mode="${{ github.event.inputs.mode }}"
-          if [ -z "$mode" ]; then
-            dow=$(TZ=Europe/Rome date +%u) # 1=Mon
-            if [ "$dow" = "1" ]; then mode="last7"; else mode="daily"; fi
-          fi
-
-          # validate YYYY-MM-DD strictly
-          input_date="${{ github.event.inputs.date }}"
-          if [[ "$mode" = "daily" ]]; then
-            if [[ "$input_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-              day="$input_date"
+          # default: daily yesterday in Europe/Rome
+          day=$(TZ=Europe/Rome date -d 'yesterday' +%F)
+          # manual override
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.date }}" ]; then
+            if [[ "${{ github.event.inputs.date }}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              day="${{ github.event.inputs.date }}"
             else
-              day=$(TZ=Europe/Rome date -d 'yesterday' +%F)
+              echo "Provided date is not YYYY-MM-DD; falling back to yesterday."
             fi
-            echo "mode=daily" >> $GITHUB_OUTPUT
-            echo "day=$day"   >> $GITHUB_OUTPUT
-            echo "Running DAILY for $day"
-          else
-            echo "mode=last7" >> $GITHUB_OUTPUT
-            echo "Running LAST7 (Mon default)"
           fi
+          echo "day=$day" >> $GITHUB_OUTPUT
+          echo "Daily target day: $day"
 
+      # DAILY: always on schedule; on manual unless mode == 'last7'
       - name: Run summarizer (daily)
-        if: ${{ (github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true') && steps.decide.outputs.mode == 'daily' }}
+        if: ${{ steps.gate.outputs.run == 'true' || (github.event_name == 'workflow_dispatch' && github.event.inputs.mode != 'last7') }}
         env:
           WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
-          LOGS_DATE:  ${{ steps.decide.outputs.day }}
+          LOGS_DATE:  ${{ steps.when.outputs.day }}
         run: python summarize_log_counts.py
 
-      - name: Run summarizer (last 7 days)
-        if: ${{ (github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true') && steps.decide.outputs.mode == 'last7' }}
+      # LAST7: only when manually requested with mode == 'last7'
+      - name: Run summarizer (last 7 days - manual only)
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'last7' }}
         env:
           WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
         run: python summarize_last_7_days.py
