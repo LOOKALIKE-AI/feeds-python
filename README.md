@@ -129,4 +129,5 @@ Logs-Sheets
 
 ## Credits
 
-Built as part of the Lookalike project automation suite (macOS, Selenium, Google Apps Script, GitHub Actions).
+Built as part of the Lookalike project automation suite (macOS, Selenium, Google Apps Script, GitHub Actions). 
+Full coding and implementation done by - Narain, Lookalike Team.
