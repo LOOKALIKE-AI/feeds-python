@@ -38,8 +38,32 @@ WEBAPP_URL:       Final[str] = _env("WEBAPP_URL")
 WAIT_TIMEOUT = int(_env("WAIT_TIMEOUT","30"))
 BETWEEN_STEPS_S = float(_env("BETWEEN_STEPS_S","0.3"))
 ONLY_ACTIVE = True  # collect only active rows
+STRICT_MATCH = _env("STRICT_MATCH", "1").lower() in ("1","true","yes","y")
 
 def log(*a): print("[logids]", *a, flush=True)
+
+def fetch_active_list() -> List[Dict]:
+    """Fetch active partners from the 'Active' sheet via Apps Script."""
+    try:
+        payload = {"getActiveList": {"sheetName": "Active"}}
+        r = requests.post(WEBAPP_URL, json=payload, timeout=60)
+        j = r.json()
+        if not j.get("ok"):
+            log("WARN: getActiveList returned not-ok:", j)
+            return []
+        # expect objects with {code, partner, active:true}
+        rows = j.get("rows", [])
+        # keep only active (defensive)
+        out = []
+        for x in rows:
+            code = str(x.get("code", "")).strip()
+            partner = str(x.get("partner", "")).strip()
+            if code or partner:
+                out.append({"code": code, "partner": partner})
+        return out
+    except Exception as e:
+        log("WARN: getActiveList failed:", e)
+        return []
 
 def is_active_cell(td) -> bool:
     try:
@@ -50,25 +74,54 @@ def is_active_cell(td) -> bool:
         return False
 
 def extract_feed_id_from_row(tds) -> int | None:
-    # primary: first hidden td
+    # 1) try first cell's textContent (hidden cells may have empty .text)
     try:
         if tds:
-            text = (tds[0].text or "").strip()
-            if text.isdigit():
-                return int(text)
+            for attr in ("textContent", "data-id", "data-feedid", "data-feed-id"):
+                v = (tds[0].get_attribute(attr) or "").strip()
+                if v.isdigit():
+                    return int(v)
     except Exception:
         pass
-    # fallback: parse onclicks in last cell
+
+    # 2) inspect last cell + its children
     try:
-        actions_td = tds[-1]
-        btns = actions_td.find_elements(By.CSS_SELECTOR, "[onclick]")
-        for b in btns:
-            oc = b.get_attribute("onclick") or ""
-            m = re.search(r"\((\d+)\)", oc)
-            if m: return int(m.group(1))
+        actions_td = tds[-1] if tds else None
+        if actions_td:
+            # direct attrs on the TD
+            for attr in ("data-id", "data-feedid", "data-feed-id"):
+                v = (actions_td.get_attribute(attr) or "").strip()
+                if v.isdigit():
+                    return int(v)
+
+            # scan clickable descendants
+            els = actions_td.find_elements(By.CSS_SELECTOR, "a,button,[onclick],[href],[data-id],[data-feedid],[data-feed-id]")
+            for el in els:
+                # data-* first
+                for attr in ("data-id", "data-feedid", "data-feed-id"):
+                    v = (el.get_attribute(attr) or "").strip()
+                    if v.isdigit():
+                        return int(v)
+
+                # href patterns: ?id=442, /feed/442, /feeds/edit/442
+                href = (el.get_attribute("href") or "")
+                m = re.search(r"[?&#](?:id|feed(?:_|)id)=(\d+)", href, re.I) or \
+                    re.search(r"/(?:feed|feeds?)/(\d+)(?:\D|$)", href, re.I)
+                if m:
+                    return int(m.group(1))
+
+                # onclick patterns: (442), { id: 442 }, id=442
+                oc = (el.get_attribute("onclick") or "")
+                m = re.search(r"\((\d+)\)", oc) or \
+                    re.search(r"\bid\s*[:=]\s*(\d+)\b", oc, re.I) or \
+                    re.search(r"feed(?:_|)id\s*[:=]\s*(\d+)\b", oc, re.I)
+                if m:
+                    return int(m.group(1))
     except Exception:
         pass
+
     return None
+
 
 def main():
     if not all([PORTAL_LOGIN_URL, PORTAL_FEEDS_URL, PORTAL_USER, PORTAL_PASS, WEBAPP_URL]):
@@ -130,6 +183,31 @@ def main():
             })
 
         log(f"Collected {len(rows_out)} active LogIDs; posting to sheet...")
+        # --- strict count guard vs Active sheet ---
+        active_list = fetch_active_list()
+        expected = len(active_list)
+        actual = len(rows_out)
+
+        if STRICT_MATCH and expected > 0 and actual != expected:
+            # Prefer matching by Code; fall back to Partner names
+            act_codes = {x["code"] for x in active_list if x.get("code")}
+            scr_codes = {x["code"] for x in rows_out if x.get("code")}
+            missing_codes = sorted(act_codes - scr_codes)
+
+            # Also compute partner-based diff as a fallback (name normalized)
+            norm = lambda s: re.sub(r"\s+", " ", (s or "").strip().lower())
+            act_partners = {norm(x["partner"]) for x in active_list if x.get("partner")}
+            scr_partners = {norm(x["partner"]) for x in rows_out if x.get("partner")}
+            missing_partners = sorted(p for p in (act_partners - scr_partners) if p)
+
+            log(f"STRICT MISMATCH: Active={expected} vs Scraped={actual}. Aborting write.")
+            if missing_codes:
+                log(f"Missing by CODE (first 10): {missing_codes[:10]}")
+            elif missing_partners:
+                log(f"Missing by PARTNER (first 10): {missing_partners[:10]}")
+            raise SystemExit(2)
+        # --- end strict guard ---
+
         payload = {
             "upsertLogIDs": {
                 "sheetName": "LogIDs",
