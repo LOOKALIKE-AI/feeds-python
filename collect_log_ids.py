@@ -35,10 +35,10 @@ PORTAL_USER:      Final[str] = _env("PORTAL_USER")
 PORTAL_PASS:      Final[str] = _env("PORTAL_PASS")
 WEBAPP_URL:       Final[str] = _env("WEBAPP_URL")
 
-WAIT_TIMEOUT = int(_env("WAIT_TIMEOUT","30"))
-BETWEEN_STEPS_S = float(_env("BETWEEN_STEPS_S","0.3"))
-ONLY_ACTIVE = True  # collect only active rows
-STRICT_MATCH = _env("STRICT_MATCH", "1").lower() in ("1","true","yes","y")
+WAIT_TIMEOUT     = int(_env("WAIT_TIMEOUT","30"))
+BETWEEN_STEPS_S  = float(_env("BETWEEN_STEPS_S","0.3"))
+ONLY_ACTIVE      = True  # collect only active rows
+STRICT_MATCH     = _env("STRICT_MATCH", "1").lower() in ("1","true","yes","y")
 
 def log(*a): print("[logids]", *a, flush=True)
 
@@ -51,9 +51,7 @@ def fetch_active_list() -> List[Dict]:
         if not j.get("ok"):
             log("WARN: getActiveList returned not-ok:", j)
             return []
-        # expect objects with {code, partner, active:true}
         rows = j.get("rows", [])
-        # keep only active (defensive)
         out = []
         for x in rows:
             code = str(x.get("code", "")).strip()
@@ -88,29 +86,27 @@ def extract_feed_id_from_row(tds) -> int | None:
     try:
         actions_td = tds[-1] if tds else None
         if actions_td:
-            # direct attrs on the TD
             for attr in ("data-id", "data-feedid", "data-feed-id"):
                 v = (actions_td.get_attribute(attr) or "").strip()
                 if v.isdigit():
                     return int(v)
 
-            # scan clickable descendants
             els = actions_td.find_elements(By.CSS_SELECTOR, "a,button,[onclick],[href],[data-id],[data-feedid],[data-feed-id]")
             for el in els:
-                # data-* first
+                # data-*
                 for attr in ("data-id", "data-feedid", "data-feed-id"):
                     v = (el.get_attribute(attr) or "").strip()
                     if v.isdigit():
                         return int(v)
 
-                # href patterns: ?id=442, /feed/442, /feeds/edit/442
+                # href patterns
                 href = (el.get_attribute("href") or "")
                 m = re.search(r"[?&#](?:id|feed(?:_|)id)=(\d+)", href, re.I) or \
                     re.search(r"/(?:feed|feeds?)/(\d+)(?:\D|$)", href, re.I)
                 if m:
                     return int(m.group(1))
 
-                # onclick patterns: (442), { id: 442 }, id=442
+                # onclick patterns
                 oc = (el.get_attribute("onclick") or "")
                 m = re.search(r"\((\d+)\)", oc) or \
                     re.search(r"\bid\s*[:=]\s*(\d+)\b", oc, re.I) or \
@@ -122,6 +118,40 @@ def extract_feed_id_from_row(tds) -> int | None:
 
     return None
 
+def switch_into_iframe_with_table(driver) -> None:
+    """If the feeds table lives inside an iframe, switch into it."""
+    try:
+        frames = driver.find_elements(By.TAG_NAME, "iframe")
+        for fr in frames:
+            driver.switch_to.frame(fr)
+            if driver.find_elements(By.CSS_SELECTOR, "table.dataTable"):
+                log("Switched into iframe with DataTable")
+                return
+            driver.switch_to.default_content()
+    except Exception as e:
+        log("Iframe scan skipped/failed:", e)
+    # leave in default content if none found
+
+def wait_for_table_ready(driver) -> None:
+    """Wait until the table is present and either rows exist or processing overlay is gone."""
+    # ensure DOM ready
+    WebDriverWait(driver, WAIT_TIMEOUT).until(
+        lambda d: d.execute_script("return document.readyState") == "complete"
+    )
+
+    # if table is inside an iframe, switch now
+    switch_into_iframe_with_table(driver)
+
+    # wait for the table element to exist
+    WebDriverWait(driver, WAIT_TIMEOUT).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "table.dataTable"))
+    )
+
+    # then wait for either rows to appear OR processing overlay to disappear
+    WebDriverWait(driver, WAIT_TIMEOUT).until(
+        lambda d: d.find_elements(By.CSS_SELECTOR, "table.dataTable tbody tr")
+                  or not d.find_elements(By.CSS_SELECTOR, ".dataTables_processing")
+    )
 
 def main():
     if not all([PORTAL_LOGIN_URL, PORTAL_FEEDS_URL, PORTAL_USER, PORTAL_PASS, WEBAPP_URL]):
@@ -146,8 +176,12 @@ def main():
 
         # Feeds
         driver.get(PORTAL_FEEDS_URL)
-        WebDriverWait(driver, WAIT_TIMEOUT).until(EC.presence_of_element_located((By.CSS_SELECTOR, "table.dataTable tbody tr")))
-        time.sleep(BETWEEN_STEPS_S)  # small settle
+        log("After nav to FEEDS => URL:", driver.current_url, "Title:", driver.title)
+        time.sleep(0.5)  # small settle
+
+        # Robust wait for table readiness (handles iframe + AJAX)
+        wait_for_table_ready(driver)
+        time.sleep(BETWEEN_STEPS_S)  # tiny settle
 
         # Read headers to locate columns
         table = driver.find_element(By.CSS_SELECTOR, "table.dataTable")
@@ -162,15 +196,16 @@ def main():
 
         for r in rows:
             tds = r.find_elements(By.TAG_NAME, "td")
-            if not tds: continue
+            if not tds:
+                continue
 
             # Active filter
-            if ONLY_ACTIVE and active_idx >= 0 and active_idx < len(tds):
+            if ONLY_ACTIVE and 0 <= active_idx < len(tds):
                 if not is_active_cell(tds[active_idx]):
                     continue
 
             feed_id = extract_feed_id_from_row(tds)
-            if not feed_id: 
+            if not feed_id:
                 continue
 
             code = (tds[code_idx].text or "").strip() if code_idx < len(tds) else ""
@@ -183,6 +218,7 @@ def main():
             })
 
         log(f"Collected {len(rows_out)} active LogIDs; posting to sheet...")
+
         # --- strict count guard vs Active sheet ---
         active_list = fetch_active_list()
         expected = len(active_list)
