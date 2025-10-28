@@ -56,3 +56,13 @@ jobs:
           PORTAL_PASS:      ${{ secrets.PORTAL_PASS }}
           WEBAPP_URL:       ${{ secrets.WEBAPP_URL }}
         run: python export_feeds.py
+      - name: Run LogIDs scraper (strict match vs Active)
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true' }}
+        env:
+          PORTAL_LOGIN_URL: ${{ secrets.PORTAL_LOGIN_URL }}
+          PORTAL_FEEDS_URL: ${{ secrets.PORTAL_FEEDS_URL }}
+          PORTAL_USER:      ${{ secrets.PORTAL_USER }}
+          PORTAL_PASS:      ${{ secrets.PORTAL_PASS }}
+          WEBAPP_URL:       ${{ secrets.WEBAPP_URL }}
+          STRICT_MATCH:     '1'     # fail if counts mismatch; don't rewrite partial sheet
+        run: python collect_log_ids.py
